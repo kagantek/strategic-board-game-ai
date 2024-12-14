@@ -1,5 +1,7 @@
 class Board:
     def __init__(self):
+        self.triangle = 4
+        self.circle = 4
         self.size = 7
         self.grid = [['.' for _ in range(self.size)] for _ in range(self.size)]
         self.initialize_board()
@@ -53,8 +55,45 @@ class Board:
         self.grid[new_x][new_y] = self.grid[x][y]
         self.grid[x][y] = '.'
 
+        self.check_captures()
+
     def capture_piece(self, x, y):
+        if(self.grid[x][y] == 'T'):
+            self.triangle -= 1
+        elif(self.grid[x][y] == 'O'):
+            self.circle -= 1
+        
         self.grid[x][y] = '.'
+
+    def check_captures(self):
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+
+        to_capture = []
+
+        for x in range(self.size):
+            for y in range(self.size):
+                piece = self.grid[x][y]
+                if piece == '.':
+                    continue
+
+                opponent = 'T' if piece == 'O' else 'O'
+
+                for dx, dy in directions:
+                    captured_pieces = []  
+                    nx, ny = x + dx, y + dy
+
+                    while self.is_valid_position(nx, ny) and self.grid[nx][ny] == opponent:
+                        captured_pieces.append((nx, ny))
+                        nx, ny = nx + dx, ny + dy
+
+                    if self.is_valid_position(nx, ny) and self.grid[nx][ny] == piece:
+                        to_capture.extend(captured_pieces)
+                    elif not self.is_valid_position(nx, ny):
+                        to_capture.extend(captured_pieces)
+
+        for cx, cy in to_capture:
+            self.capture_piece(cx, cy)
+
 
     def reset(self):
         self.grid = [['.' for _ in range(self.size)] for _ in range(self.size)]
@@ -68,31 +107,15 @@ if __name__ == "__main__":
     print("Initial Board:")
     board.display()
 
-    print("Move triangle from (0, 0) up (invalid):")
-    try:
-        board.move_piece(0, 0, "up")
-    except ValueError as e:
-        print(f"Error: {e}")
+    print("Simulate a multiple capture scenario (TOOT):")
+    board.grid[2][0] = 'T'
+    board.grid[2][1] = 'O'
+    board.grid[2][2] = 'O'
+    board.grid[2][3] = 'T'
     board.display()
 
-    print("Move triangle from (0, 0) right:")
-    try:
-        board.move_piece(0, 0, "right")
-    except ValueError as e:
-        print(f"Error: {e}")
+    print("Check for captures:")
+    board.check_captures()
     board.display()
 
-    print("Move triangle from (0, 1) down:")
-    try:
-        board.move_piece(0, 1, "down")
-    except ValueError as e:
-        print(f"Error: {e}")
-    board.display()
-
-    print("Captured piece (6,0): ")
-    board.capture_piece(6, 0)
-    board.display()
-
-    print("Resetting the board:")
-    board.reset()
-    board.display()
+    print("Remaining pieces - Triangles:", board.triangle, "Circles:", board.circle)

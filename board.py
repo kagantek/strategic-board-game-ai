@@ -7,13 +7,11 @@ class Board:
         self.initialize_board()
 
     def initialize_board(self):
-        #Triangle (Player 1 - AI)
         self.grid[0][0] = 'T'
         self.grid[2][0] = 'T'
         self.grid[4][6] = 'T'
         self.grid[6][6] = 'T'
 
-        # Circle (Player 2 - Human)
         self.grid[4][0] = 'O'
         self.grid[6][0] = 'O'
         self.grid[0][6] = 'O'
@@ -66,7 +64,7 @@ class Board:
         self.grid[x][y] = '.'
 
     def check_captures(self):
-        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Up, Down, Left, Right
+        directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
         to_capture = []
 
@@ -98,24 +96,3 @@ class Board:
     def reset(self):
         self.grid = [['.' for _ in range(self.size)] for _ in range(self.size)]
         self.initialize_board()
-
-
-
-#Test
-if __name__ == "__main__":
-    board = Board()
-    print("Initial Board:")
-    board.display()
-
-    print("Simulate a multiple capture scenario (TOOT):")
-    board.grid[2][0] = 'T'
-    board.grid[2][1] = 'O'
-    board.grid[2][2] = 'O'
-    board.grid[2][3] = 'T'
-    board.display()
-
-    print("Check for captures:")
-    board.check_captures()
-    board.display()
-
-    print("Remaining pieces - Triangles:", board.triangle, "Circles:", board.circle)

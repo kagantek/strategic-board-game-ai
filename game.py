@@ -1,22 +1,26 @@
 from board import Board
+from human import Human
+from ai import AI
 
 class Game:
     def __init__(self):
         self.board = Board()
-        self.turn = "AI" 
-        self.total_moves = 0  
+        self.turn = "AI"
+        self.total_moves = 0
+        self.human_player = Human(self.board)
+        self.ai_player = AI(self.board)
 
     def play_turn(self):
         self.board.display()
         if self.turn == "AI":
             print("AI's turn...")
-            # TODO: Call AI move logic
+            self.ai_player.play_turn()
         else:
             print("Human's turn...")
-            # TODO: Handle human input
+            self.human_player.play_turn()
 
         self.switch_turn()
-        self.total_moves += 1  # Increment total moves
+        self.total_moves += 1
 
     def switch_turn(self):
         self.turn = "Human" if self.turn == "AI" else "AI"

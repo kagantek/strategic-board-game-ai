@@ -7,8 +7,8 @@ class Game:
         self.board = Board()
         self.turn = "AI"
         self.total_moves = 0
-        self.human_player = Human(self.board)
-        self.ai_player = AI(self.board)
+        self.human_player = Human(self.board, self)
+        self.ai_player = AI(self.board, self)
 
     def play_turn(self):
         self.board.display()
@@ -44,6 +44,9 @@ class Game:
                 print("It's a draw!")
             return True
         return False
+    
+    def return_total_moves(self):
+        return self.total_moves
 
     def run(self):
         print("Welcome to the Strategic Board Game!")

@@ -1,6 +1,7 @@
 class Human:
-    def __init__(self, board):
+    def __init__(self, board, game):
         self.board = board
+        self.game = game
 
     def play_turn(self):
         player_pieces = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'O']

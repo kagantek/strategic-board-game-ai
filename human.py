@@ -18,19 +18,16 @@ class Human:
                 print("1. Up\n2. Down\n3. Left\n4. Right")
                 choice = input("Enter your choice (1-4): ").strip()
 
-                # Map choice to direction
                 direction = self.get_direction(choice)
                 if not direction:
                     raise ValueError("Invalid choice. Please select 1, 2, 3, or 4.")
 
-                # Validate the move
                 if not self.validate_move(x, y, direction):
                     raise ValueError("Invalid move! The destination is either occupied or out of bounds.")
 
-                # Perform the move
                 self.execute_move(x, y, direction)
                 print(f"Moved piece at ({x}, {y}) {direction}.")
-                break  # Exit loop if the move is successful
+                break 
 
             except ValueError as e:
                 print(f"Error: {e}. Please try again.")

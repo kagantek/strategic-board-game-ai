@@ -7,17 +7,11 @@ class Human:
         self.game.start_human_turn()
 
     def validate_move(self, x, y, direction):
-        if direction == "up":
-            new_x, new_y = x - 1, y
-        elif direction == "down":
-            new_x, new_y = x + 1, y
-        elif direction == "left":
-            new_x, new_y = x, y - 1
-        elif direction == "right":
-            new_x, new_y = x, y + 1
-        else:
+        from constants import DIRECTIONS
+        if direction not in DIRECTIONS:
             return False
-        return self.board.is_valid_move(x, y, new_x, new_y)
+        dx, dy = DIRECTIONS[direction]
+        return self.board.is_valid_move(x, y, x + dx, y + dy)
 
     def execute_move(self, x, y, direction):
         self.board.move_piece(x, y, direction)

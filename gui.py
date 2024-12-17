@@ -69,7 +69,6 @@ class GameGUI:
                     color = "lightgreen"
                 self.cells[i+1][j+1].config(text=text, bg=color)
 
-        # Highlight selected piece if any
         if self.game.selected_piece:
             x, y = self.game.selected_piece
             self.cells[x+1][y+1].config(bg="yellow")

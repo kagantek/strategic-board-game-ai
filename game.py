@@ -41,7 +41,6 @@ class Game:
             self.play_turn()
 
     def start_human_turn(self):
-        # Gather human pieces
         self.human_pieces_to_move = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'O']
         self.current_piece_index = 0
         self.move_next_human_piece()

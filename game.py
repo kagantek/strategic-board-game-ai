@@ -9,7 +9,7 @@ class Game:
         self.total_moves = 0
         self.human_player = Human(self.board, self)
         self.ai_player = AI(self.board, self)
-        self.gui = None  # Will be set by GameGUI when ready
+        self.gui = None
 
         self.human_pieces_to_move = []
         self.current_piece_index = 0
@@ -19,7 +19,6 @@ class Game:
         self.gui = gui
 
     def run(self):
-        # Start the game flow
         self.gui.update_board_display()
         self.play_turn()
 
@@ -28,7 +27,6 @@ class Game:
             return
         if self.turn == "AI":
             self.gui.set_info("AI's turn... thinking.")
-            # Delay AI move slightly:
             self.gui.root.after(500, self.ai_action)
         else:
             self.gui.set_info("Human's turn")
@@ -71,7 +69,6 @@ class Game:
         self.after_human_piece_moved()
 
     def execute_human_move_coords(self, x, y):
-        # Attempt to move selected piece to (x,y)
         if not self.selected_piece:
             self.gui.error("No piece selected.")
             return
@@ -109,7 +106,6 @@ class Game:
             self.gui.game_over("It's a draw!")
             return True
         elif self.total_moves >= 50:
-            # 50 moves reached
             if self.board.triangle > self.board.circle:
                 self.gui.game_over("AI wins!")
             elif self.board.triangle < self.board.circle:

@@ -77,7 +77,6 @@ class GameGUI:
     def on_cell_click(self, x, y):
         if self.game.turn != "Human":
             return
-        # If no piece selected, user must select the correct piece
         if not self.game.selected_piece:
             expected_piece = self.game.human_pieces_to_move[self.game.current_piece_index]
             if (x, y) == expected_piece and self.game.board.grid[x][y] == "O":
@@ -86,7 +85,6 @@ class GameGUI:
             else:
                 self.error("Please select the highlighted piece.")
         else:
-            # Attempt to move to (x,y)
             sx, sy = self.game.selected_piece
             if abs(x - sx) + abs(y - sy) == 1 and self.game.board.grid[x][y] == ".":
                 self.game.execute_human_move_coords(x, y)

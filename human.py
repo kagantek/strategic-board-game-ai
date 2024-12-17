@@ -4,7 +4,6 @@ class Human:
         self.game = game
 
     def play_turn(self):
-        # Just notify the game that we start human turn, no I/O here
         self.game.start_human_turn()
 
     def validate_move(self, x, y, direction):

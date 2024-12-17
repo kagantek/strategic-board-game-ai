@@ -2,25 +2,19 @@ class AI:
     def __init__(self, board, game, max_depth=3):
         self.board = board
         self.game = game
-        self.max_depth = max_depth  # Depth limit for the Minimax algorithm
+        self.max_depth = max_depth
 
     def play_turn(self):
-        print("AI is thinking...")
         ai_pieces = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'T']
-
         for x, y in ai_pieces:
             best_move = self.find_best_move_for_piece(x, y)
             if best_move:
                 direction = best_move
                 self.board.move_piece(x, y, direction)
-                print(f"AI moved piece at ({x}, {y}) {direction}.")
-            else:
-                print(f"AI could not find a valid move for piece at ({x}, {y}).")
 
     def find_best_move_for_piece(self, x, y):
         best_score = float('-inf')
         best_direction = None
-
         for direction in ["up", "down", "left", "right"]:
             if self.validate_move(x, y, direction):
                 original_board = [row[:] for row in self.board.grid]
@@ -37,7 +31,6 @@ class AI:
                 if score > best_score:
                     best_score = score
                     best_direction = direction
-
         return best_direction
 
     def minimax(self, depth, is_maximizing):
@@ -55,14 +48,11 @@ class AI:
                         original_circle = self.board.circle
 
                         self.board.move_piece(x, y, direction)
-                        eval = self.minimax(depth - 1, False)
-
-                        # Undo the move
+                        eval_ = self.minimax(depth - 1, False)
                         self.board.grid = original_board
                         self.board.triangle = original_triangle
                         self.board.circle = original_circle
-
-                        max_eval = max(max_eval, eval)
+                        max_eval = max(max_eval, eval_)
             return max_eval
         else:
             min_eval = float('inf')
@@ -75,27 +65,23 @@ class AI:
                         original_circle = self.board.circle
 
                         self.board.move_piece(x, y, direction)
-                        eval = self.minimax(depth - 1, True)
-
-                        # Undo the move
+                        eval_ = self.minimax(depth - 1, True)
                         self.board.grid = original_board
                         self.board.triangle = original_triangle
                         self.board.circle = original_circle
-
-                        min_eval = min(min_eval, eval)
+                        min_eval = min(min_eval, eval_)
             return min_eval
 
     def evaluate_board(self):
         piece_difference = self.board.triangle - self.board.circle
-
-        moves_remaining = 50 - self.game.total_moves
+        moves_remaining = 50 - self.game.return_total_moves()
         if moves_remaining > 0:
             return piece_difference + moves_remaining * 0.1
         else:
             return piece_difference
 
     def is_terminal(self):
-        return self.board.triangle == 0 or self.board.circle == 0 or self.board.triangle + self.board.circle == 0
+        return self.board.triangle == 0 or self.board.circle == 0 or (self.board.triangle + self.board.circle == 0)
 
     def validate_move(self, x, y, direction):
         if direction == "up":

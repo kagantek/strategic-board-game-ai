@@ -1,5 +1,7 @@
 from game import Game
+from gui import GameGUI
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    gui = GameGUI(game)
+    gui.run()

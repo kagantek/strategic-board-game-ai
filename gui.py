@@ -88,8 +88,7 @@ class GameGUI:
             return
 
         # Check available moves
-        available_pieces = [(i, j) for i, j in self._get_available_pieces() 
-                          if (i, j) not in self.moved_pieces]
+        available_pieces = self._get_available_pieces()
 
         if not available_pieces and self.moves_remaining > 0:
             self.end_human_turn()
@@ -159,3 +158,10 @@ class GameGUI:
         for x, y in self.available_pieces:
             if self.game.board.grid[x][y] == 'O':
                 self.cells[x+1][y+1].config(bg="yellow")
+
+    def _get_available_pieces(self):
+        """Returns list of available pieces that can be moved"""
+        return [(x, y) for x in range(self.game.board.size)
+                for y in range(self.game.board.size)
+                if self.game.board.grid[x][y] == 'O' 
+                and (x, y) not in self.moved_pieces]

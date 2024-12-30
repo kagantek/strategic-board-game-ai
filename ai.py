@@ -60,24 +60,35 @@ class AI:
                 'pieces': 100,
                 'position': 90,
                 'mobility': 80,
-                'threats': 70
+                'threats': 70,
+                # Add missing keys
+                'piece_value': 100,
+                'capture_potential': 70,
+                'defense': 50
             },
             'mid_game': {
                 'pieces': 90,
                 'position': 80,
                 'mobility': 85,
-                'threats': 100
+                'threats': 100,
+                # Add missing keys
+                'piece_value': 90,
+                'capture_potential': 100,
+                'defense': 60
             },
             'late_game': {
                 'pieces': 120,
                 'position': 60,
                 'mobility': 70,
-                'threats': 110
+                'threats': 110,
+                # Add missing keys
+                'piece_value': 120,
+                'capture_potential': 110,
+                'defense': 80
             }
         }
 
-    def _get_phase_weights(self):
-        total_moves = self.game.return_total_moves()
+    def _get_phase_weights(self, total_moves):
         if total_moves < 15:
             return self.weights['early_game']
         elif total_moves < 35:

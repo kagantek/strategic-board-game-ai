@@ -41,9 +41,22 @@ class Game:
             self.play_turn()
 
     def start_human_turn(self):
-        self.human_pieces_to_move = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'O']
-        self.current_piece_index = 0
-        self.move_next_human_piece()
+        self.available_pieces = [(x, y) for x in range(self.board.size) 
+                        for y in range(self.board.size) 
+                        if self.board.grid[x][y] == 'O']
+        self.gui.moves_remaining = 2
+        self.gui.set_info("Select a piece to move. Moves remaining: 2")
+        self.gui.enable_piece_selection(self.available_pieces)
+
+    def after_human_piece_moved(self):
+        self.selected_piece = None
+        self.gui.update_board_display()
+        self.moves_remaining -= 1
+        
+        if self.moves_remaining > 0:
+            self.gui.set_info(f"Select another piece. Moves remaining: {self.moves_remaining}")
+        else:
+            self.end_human_turn()
 
     def move_next_human_piece(self):
         if self.current_piece_index >= len(self.human_pieces_to_move):
@@ -68,15 +81,18 @@ class Game:
         self.after_human_piece_moved()
 
     def execute_human_move_coords(self, x, y):
-        if not self.selected_piece:
+        if not self.gui.selected_piece:
             self.gui.error("No piece selected.")
             return
-        sx, sy = self.selected_piece
+        sx, sy = self.gui.selected_piece
         if not self.human_player.validate_move_coords(sx, sy, x, y):
             self.gui.error("Invalid Move: Cannot move to that cell.")
             return
         self.human_player.execute_move_coords(sx, sy, x, y)
-        self.after_human_piece_moved()
+        self.gui.disable_direction_buttons()
+        self.gui.update_board_display()
+        if self.gui.moves_remaining > 1:
+            self.gui.set_info(f"Select another piece. Moves remaining: {self.gui.moves_remaining - 1}")
 
     def after_human_piece_moved(self):
         self.selected_piece = None

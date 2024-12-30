@@ -8,10 +8,31 @@ class AI:
 
     def play_turn(self):
         ai_pieces = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'T']
-        for x, y in ai_pieces:
-            best_move = self.find_best_move_for_piece(x, y)
-            if best_move:
-                self.board.move_piece(x, y, best_move)
+        moves_made = 0
+        while moves_made < 2 and ai_pieces:
+            best_score = float('-inf')
+            best_move = None
+            best_piece = None
+            
+            for x, y in ai_pieces:
+                direction = self.find_best_move_for_piece(x, y)
+                if direction:
+                    original_state = self.snapshot_board()
+                    self.board.move_piece(x, y, direction)
+                    score = self.evaluate_board()
+                    self.restore_board(original_state)
+                    
+                    if score > best_score:
+                        best_score = score
+                        best_move = direction
+                        best_piece = (x, y)
+            
+            if best_piece and best_move:
+                self.board.move_piece(best_piece[0], best_piece[1], best_move)
+                ai_pieces.remove(best_piece)
+                moves_made += 1
+            else:
+                break
 
     def find_best_move_for_piece(self, x, y):
         best_score = float('-inf')

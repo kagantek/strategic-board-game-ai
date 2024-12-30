@@ -48,6 +48,8 @@ class GameGUI:
         self.down_button.grid(row=2, column=1)
 
         self.disable_direction_buttons()
+        self.moves_remaining = 2
+        self.selected_piece = None
 
     def run(self):
         self.game.run()
@@ -69,27 +71,37 @@ class GameGUI:
                     color = "lightgreen"
                 self.cells[i+1][j+1].config(text=text, bg=color)
 
-        if self.game.selected_piece:
-            x, y = self.game.selected_piece
-            self.cells[x+1][y+1].config(bg="yellow")
+        if self.selected_piece:
+            x, y = self.selected_piece
+            self.cells[x+1][y+1].config(bg="orange")
 
     def on_cell_click(self, x, y):
         if self.game.turn != "Human":
             return
-        if not self.game.selected_piece:
-            expected_piece = self.game.human_pieces_to_move[self.game.current_piece_index]
-            if (x, y) == expected_piece and self.game.board.grid[x][y] == "O":
-                self.game.selected_piece = (x, y)
+
+        if self.selected_piece and (x, y) == self.selected_piece:
+            self.selected_piece = None
+            self.disable_direction_buttons()
+            self.update_board_display()
+            return
+
+        if not self.selected_piece:
+            if self.game.board.grid[x][y] == "O" and self.moves_remaining > 0:
+                self.selected_piece = (x, y)
                 self.update_board_display()
+                self.enable_direction_buttons()
             else:
-                self.error("Please select the highlighted piece.")
+                self.error("Please select one of your pieces.")
         else:
-            sx, sy = self.game.selected_piece
+            sx, sy = self.selected_piece
             if abs(x - sx) + abs(y - sy) == 1 and self.game.board.grid[x][y] == ".":
                 self.game.execute_human_move_coords(x, y)
-            else:
-                if (x, y) != (sx, sy):
-                    self.error("Click on an adjacent empty cell to move, or use direction buttons.")
+                self.selected_piece = None
+                self.moves_remaining -= 1
+                self.update_board_display()
+                
+                if self.moves_remaining == 0:
+                    self.game.end_human_turn()
 
     def set_info(self, text):
         self.info_label.config(text=text)
@@ -111,3 +123,13 @@ class GameGUI:
         self.down_button.config(state="normal")
         self.left_button.config(state="normal")
         self.right_button.config(state="normal")
+
+    def enable_piece_selection(self, available_pieces):
+        self.available_pieces = available_pieces
+        self.highlight_available_pieces()
+
+    def highlight_available_pieces(self):
+        self.update_board_display()
+        for x, y in self.available_pieces:
+            if self.game.board.grid[x][y] == 'O':
+                self.cells[x+1][y+1].config(bg="yellow")

@@ -10,9 +10,6 @@ class Game:
         self.human_player = Human(self.board, self)
         self.ai_player = AI(self.board, self)
         self.gui = None
-
-        self.human_pieces_to_move = []
-        self.current_piece_index = 0
         self.selected_piece = None
 
     def set_gui(self, gui):
@@ -25,12 +22,13 @@ class Game:
     def play_turn(self):
         if self.is_game_over():
             return
+            
         if self.turn == "AI":
             self.gui.set_info("AI's turn... thinking.")
             self.gui.root.after(500, self.ai_action)
         else:
-            self.gui.set_info("Human's turn")
-            self.human_player.play_turn()
+            self.gui.set_info("Your turn. Select a piece to move.")
+            self.start_human_turn()
 
     def ai_action(self):
         self.ai_player.play_turn()
@@ -41,12 +39,11 @@ class Game:
             self.play_turn()
 
     def start_human_turn(self):
-        self.available_pieces = [(x, y) for x in range(self.board.size) 
+        available_pieces = [(x, y) for x in range(self.board.size) 
                         for y in range(self.board.size) 
                         if self.board.grid[x][y] == 'O']
         self.gui.moves_remaining = 2
-        self.gui.set_info("Select a piece to move. Moves remaining: 2")
-        self.gui.enable_piece_selection(self.available_pieces)
+        self.gui.enable_piece_selection(available_pieces)
 
     def after_human_piece_moved(self):
         self.selected_piece = None
@@ -66,7 +63,7 @@ class Game:
         x, y = piece_pos
         self.selected_piece = (x, y)
         self.gui.update_board_display()
-        self.gui.set_info(f"Move piece at ({x}, {y}). Select it or use directions.")
+        self.gui.set_info(f"Move piece at ({x}, y). Select it or use directions.")
         self.gui.enable_direction_buttons()
 
     def execute_human_move_direction(self, direction):
@@ -80,19 +77,16 @@ class Game:
         self.human_player.execute_move(x, y, direction)
         self.after_human_piece_moved()
 
-    def execute_human_move_coords(self, x, y):
+    def execute_human_move_coords(self, new_x, new_y):
         if not self.gui.selected_piece:
-            self.gui.error("No piece selected.")
-            return
+            return False
+            
         sx, sy = self.gui.selected_piece
-        if not self.human_player.validate_move_coords(sx, sy, x, y):
-            self.gui.error("Invalid Move: Cannot move to that cell.")
-            return
-        self.human_player.execute_move_coords(sx, sy, x, y)
-        self.gui.disable_direction_buttons()
-        self.gui.update_board_display()
-        if self.gui.moves_remaining > 1:
-            self.gui.set_info(f"Select another piece. Moves remaining: {self.gui.moves_remaining - 1}")
+        if not self.human_player.validate_move_coords(sx, sy, new_x, new_y):
+            return False
+            
+        self.human_player.execute_move_coords(sx, sy, new_x, new_y)
+        return True
 
     def after_human_piece_moved(self):
         self.selected_piece = None
@@ -106,6 +100,11 @@ class Game:
         self.total_moves += 1
         if not self.is_game_over():
             self.play_turn()
+
+    def end_turn(self):
+        self.switch_turn()
+        self.total_moves += 1
+        self.play_turn()
 
     def switch_turn(self):
         self.turn = "Human" if self.turn == "AI" else "AI"

@@ -50,6 +50,7 @@ class GameGUI:
         self.disable_direction_buttons()
         self.moves_remaining = 2
         self.selected_piece = None
+        self.moved_pieces = set()  # Track pieces that have been moved
 
     def run(self):
         self.game.run()
@@ -79,29 +80,54 @@ class GameGUI:
         if self.game.turn != "Human":
             return
 
+        # Deselect current piece
         if self.selected_piece and (x, y) == self.selected_piece:
             self.selected_piece = None
             self.disable_direction_buttons()
             self.update_board_display()
             return
 
+        # Check available moves
+        available_pieces = [(i, j) for i, j in self._get_available_pieces() 
+                          if (i, j) not in self.moved_pieces]
+
+        if not available_pieces and self.moves_remaining > 0:
+            self.end_human_turn()
+            return
+
+        # Handle piece selection and movement
         if not self.selected_piece:
-            if self.game.board.grid[x][y] == "O" and self.moves_remaining > 0:
-                self.selected_piece = (x, y)
-                self.update_board_display()
-                self.enable_direction_buttons()
-            else:
-                self.error("Please select one of your pieces.")
+            self._handle_piece_selection(x, y)
         else:
-            sx, sy = self.selected_piece
-            if abs(x - sx) + abs(y - sy) == 1 and self.game.board.grid[x][y] == ".":
-                self.game.execute_human_move_coords(x, y)
-                self.selected_piece = None
-                self.moves_remaining -= 1
-                self.update_board_display()
-                
-                if self.moves_remaining == 0:
-                    self.game.end_human_turn()
+            self._handle_piece_movement(x, y)
+
+    def _handle_piece_selection(self, x, y):
+        if (x, y) in self.moved_pieces:
+            self.error("This piece has already been moved.")
+            return
+            
+        if self.game.board.grid[x][y] == "O":
+            self.selected_piece = (x, y)
+            self.update_board_display()
+            self.enable_direction_buttons()
+
+    def _handle_piece_movement(self, x, y):
+        if self.game.execute_human_move_coords(x, y):
+            self.moved_pieces.add((x, y))
+            self.selected_piece = None
+            self.moves_remaining -= 1
+            self.disable_direction_buttons()
+            self.update_board_display()
+            
+            if self.moves_remaining == 0:
+                self.end_human_turn()
+
+    def end_human_turn(self):
+        self.moved_pieces.clear()
+        self.moves_remaining = 2
+        self.selected_piece = None
+        self.disable_direction_buttons()
+        self.game.end_turn()
 
     def set_info(self, text):
         self.info_label.config(text=text)

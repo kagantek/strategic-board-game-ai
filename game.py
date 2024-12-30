@@ -4,6 +4,7 @@
 from board import Board
 from human import Human
 from ai import AI
+from constants import DIRECTIONS
 
 class Game:
     def __init__(self):
@@ -18,6 +19,7 @@ class Game:
         self.human_pieces_to_move = []
         self.current_piece_index = 0
         self.selected_piece = None
+        self.moved_pieces = set()  # Track pieces moved this turn
 
     def set_gui(self, gui):
         self.gui = gui
@@ -45,6 +47,7 @@ class Game:
             self.play_turn()
 
     def start_human_turn(self):
+        self.moved_pieces.clear()  # Reset moved pieces at turn start
         self.available_pieces = [(x, y) for x in range(self.board.size) 
                         for y in range(self.board.size) 
                         if self.board.grid[x][y] == 'O']
@@ -89,12 +92,33 @@ class Game:
             self.gui.error("No piece selected.")
             return
         sx, sy = self.gui.selected_piece
+        
+        # Check if piece was already moved
+        if (sx, sy) in self.moved_pieces:
+            self.gui.error("This piece was already moved.")
+            return
+            
         if not self.human_player.validate_move_coords(sx, sy, x, y):
             self.gui.error("Invalid Move: Cannot move to that cell.")
             return
+            
         self.human_player.execute_move_coords(sx, sy, x, y)
+        self.moved_pieces.add((x, y))  # Track moved piece
         self.gui.disable_direction_buttons()
         self.gui.update_board_display()
+
+        # Check for immediate game over
+        if self.board.triangle == 0:
+            self.gui.game_over("Human wins!")
+            return
+
+        # Check if any valid moves remain
+        if not self._has_valid_moves('O'):
+            self.moves_remaining = 0
+            self.gui.moves_remaining = 0
+            self.end_human_turn()
+            return
+
         if self.gui.moves_remaining > 1:
             self.gui.set_info(f"Select another piece. Moves remaining: {self.gui.moves_remaining - 1}")
 
@@ -136,3 +160,18 @@ class Game:
 
     def return_total_moves(self):
         return self.total_moves
+
+    def _has_valid_moves(self, piece_type):
+        # Check if any unmoved pieces can make valid moves
+        for x in range(self.board.size):
+            for y in range(self.board.size):
+                if (self.board.grid[x][y] == piece_type and 
+                    (x, y) not in self.moved_pieces):
+                    # Check all possible directions
+                    for dx, dy in DIRECTIONS.values():
+                        new_x, new_y = x + dx, y + dy
+                        if (0 <= new_x < self.board.size and 
+                            0 <= new_y < self.board.size and 
+                            self.board.grid[new_x][new_y] == '.'):
+                            return True
+        return False

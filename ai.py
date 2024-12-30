@@ -4,16 +4,19 @@
 from constants import DIRECTIONS
 
 class AI:
-    def __init__(self, board, game, max_depth=3):
-        # setup AI with board and search depth
+    def __init__(self, board, game, depth=3):
+        # setup ai with board and search depth
         self.board = board
         self.game = game
-        self.max_depth = max_depth
+        self.depth = depth
 
     def play_turn(self):
-        # make two moves per turn if possible
-        ai_pieces = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'T']
+        ai_pieces = [(x, y) for x in range(self.board.size) 
+                    for y in range(self.board.size) 
+                    if self.board.grid[x][y] == 'T']
         moves_made = 0
+        moved_pieces = set()  # track moved pieces
+
         while moves_made < 2 and ai_pieces:
             best_score = float('-inf')
             best_move = None
@@ -21,34 +24,48 @@ class AI:
             
             # find best move for each piece
             for x, y in ai_pieces:
-                direction = self.find_best_move_for_piece(x, y)
-                if direction:
-                    original_state = self.snapshot_board()
-                    self.board.move_piece(x, y, direction)
-                    score = self.evaluate_board()
-                    self.restore_board(original_state)
-                    
-                    if score > best_score:
-                        best_score = score
-                        best_move = direction
-                        best_piece = (x, y)
+                if (x, y) not in moved_pieces:  # only consider unmoved pieces
+                    direction = self.find_best_move(x, y)
+                    if direction:
+                        original_state = self.snapshot_board()
+                        self.board.move_piece(x, y, direction)
+                        score = self.evaluate_board()
+                        self.restore_board(original_state)
+                        
+                        if score > best_score:
+                            best_score = score
+                            best_move = direction
+                            best_piece = (x, y)
             
             # make the best move found
             if best_piece and best_move:
                 self.board.move_piece(best_piece[0], best_piece[1], best_move)
+                moved_pieces.add(best_piece)  # add to moved pieces
                 ai_pieces.remove(best_piece)
                 moves_made += 1
+                
+                if self.board.circle == 0:
+                    self.game.gui.game_over("AI wins!")
+                    return
+                    
+                remaining_pieces = [(x, y) for x, y in ai_pieces 
+                                  if (x, y) not in moved_pieces]
+                if not remaining_pieces:
+                    break
             else:
                 break
 
-    def find_best_move_for_piece(self, x, y):
+
+    # evaluation determines the piece count, positional advantage, mobility, capture probability and moves remaining and acts accordingly.
+    
+    def find_best_move(self, x, y):
         best_score = float('-inf')
         best_direction = None
         for direction, (dx, dy) in DIRECTIONS.items():
             if self.board.is_valid_move(x, y, x + dx, y + dy):
                 original_state = self.snapshot_board()
                 self.board.move_piece(x, y, direction)
-                score = self.minimax(self.max_depth, is_maximizing=False)
+                score = self.minimax(self.depth, is_maximizing=False)
                 self.restore_board(original_state)
 
                 if score > best_score:

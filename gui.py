@@ -86,6 +86,11 @@ class GameGUI:
         if self.game.turn != "Human":
             return
 
+        # Prevent selecting already moved pieces
+        if (x, y) in self.game.moved_pieces:
+            self.error("This piece was already moved this turn.")
+            return
+
         if self.selected_piece and (x, y) == self.selected_piece:
             self.selected_piece = None
             self.disable_direction_buttons()

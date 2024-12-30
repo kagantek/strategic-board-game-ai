@@ -6,7 +6,7 @@ from constants import DIRECTIONS
 class Board:
     def __init__(self):
         # setup initial game state
-        self.triangle = 4  # AI pieces
+        self.triangle = 4  # ai pieces
         self.circle = 4    # human pieces
         self.size = 7      # board size
         self.grid = [['.' for _ in range(self.size)] for _ in range(self.size)]
@@ -14,13 +14,13 @@ class Board:
 
     def initialize_board(self):
         # place starting pieces on board
-        # AI pieces (T)
+        # ai pieces (T)
         self.grid[0][0] = 'T'
         self.grid[2][0] = 'T'
         self.grid[4][6] = 'T'
         self.grid[6][6] = 'T'
 
-        # Human pieces (O)
+        # human pieces (O)
         self.grid[4][0] = 'O'
         self.grid[6][0] = 'O'
         self.grid[0][6] = 'O'

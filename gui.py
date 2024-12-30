@@ -1,8 +1,12 @@
+#Kagan Tek - 20210702027 - Strategic Board Game With AI
+
+# handles game display and user interaction
 import tkinter as tk
 from tkinter import messagebox
 
 class GameGUI:
     def __init__(self, game):
+        # setup game window and controls
         self.game = game
         self.game.set_gui(self)
 
@@ -51,10 +55,12 @@ class GameGUI:
         self.moves_remaining = 2
         self.selected_piece = None
 
+    # start the game loop
     def run(self):
         self.game.run()
         self.root.mainloop()
 
+    # update the board display
     def update_board_display(self):
         board = self.game.board
         size = board.size
@@ -75,6 +81,7 @@ class GameGUI:
             x, y = self.selected_piece
             self.cells[x+1][y+1].config(bg="orange")
 
+    # handle cell click event
     def on_cell_click(self, x, y):
         if self.game.turn != "Human":
             return
@@ -103,31 +110,38 @@ class GameGUI:
                 if self.moves_remaining == 0:
                     self.game.end_human_turn()
 
+    # set info label text
     def set_info(self, text):
         self.info_label.config(text=text)
 
+    # show error message
     def error(self, text):
         messagebox.showerror("Error", text)
 
+    # show game over message
     def game_over(self, text):
         messagebox.showinfo("Game Over", text)
 
+    # disable direction buttons
     def disable_direction_buttons(self):
         self.up_button.config(state="disabled")
         self.down_button.config(state="disabled")
         self.left_button.config(state="disabled")
         self.right_button.config(state="disabled")
 
+    # enable direction buttons
     def enable_direction_buttons(self):
         self.up_button.config(state="normal")
         self.down_button.config(state="normal")
         self.left_button.config(state="normal")
         self.right_button.config(state="normal")
 
+    # enable piece selection
     def enable_piece_selection(self, available_pieces):
         self.available_pieces = available_pieces
         self.highlight_available_pieces()
 
+    # highlight available pieces
     def highlight_available_pieces(self):
         self.update_board_display()
         for x, y in self.available_pieces:

@@ -1,19 +1,26 @@
+#Kagan Tek - 20210702027 - Strategic Board Game With AI
+
+# handles the game board, pieces and moves
 from constants import DIRECTIONS
 
 class Board:
     def __init__(self):
-        self.triangle = 4
-        self.circle = 4
-        self.size = 7
+        # setup initial game state
+        self.triangle = 4  # AI pieces
+        self.circle = 4    # human pieces
+        self.size = 7      # board size
         self.grid = [['.' for _ in range(self.size)] for _ in range(self.size)]
         self.initialize_board()
 
     def initialize_board(self):
+        # place starting pieces on board
+        # AI pieces (T)
         self.grid[0][0] = 'T'
         self.grid[2][0] = 'T'
         self.grid[4][6] = 'T'
         self.grid[6][6] = 'T'
 
+        # Human pieces (O)
         self.grid[4][0] = 'O'
         self.grid[6][0] = 'O'
         self.grid[0][6] = 'O'

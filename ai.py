@@ -1,12 +1,17 @@
+#Kagan Tek - 20210702027 - Strategic Board Game With AI
+
+# AI player logic using minimax and board evaluation
 from constants import DIRECTIONS
 
 class AI:
     def __init__(self, board, game, max_depth=3):
+        # setup AI with board and search depth
         self.board = board
         self.game = game
         self.max_depth = max_depth
 
     def play_turn(self):
+        # make two moves per turn if possible
         ai_pieces = [(x, y) for x in range(self.board.size) for y in range(self.board.size) if self.board.grid[x][y] == 'T']
         moves_made = 0
         while moves_made < 2 and ai_pieces:
@@ -14,6 +19,7 @@ class AI:
             best_move = None
             best_piece = None
             
+            # find best move for each piece
             for x, y in ai_pieces:
                 direction = self.find_best_move_for_piece(x, y)
                 if direction:
@@ -27,6 +33,7 @@ class AI:
                         best_move = direction
                         best_piece = (x, y)
             
+            # make the best move found
             if best_piece and best_move:
                 self.board.move_piece(best_piece[0], best_piece[1], best_move)
                 ai_pieces.remove(best_piece)

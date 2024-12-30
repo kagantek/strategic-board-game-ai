@@ -1,9 +1,13 @@
+#Kagan Tek - 20210702027 - Strategic Board Game With AI
+
+# main game logic, handles turns and game flow
 from board import Board
 from human import Human
 from ai import AI
 
 class Game:
     def __init__(self):
+        # setup game components
         self.board = Board()
         self.turn = "AI"
         self.total_moves = 0
